@@ -9,7 +9,7 @@ var speed = document.getElementById("speed");
 var w = 20;
 var Size = Math.floor((innerWidth - 100) / w);
 
-var gap = false;
+var gap = document.getElementById("gap").value;
 var running = false; //there are corrently working sorters
 
 class Bar {

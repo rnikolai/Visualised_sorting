@@ -6,7 +6,7 @@ var c = canvas.getContext("2d");
 var range = document.getElementById("range");
 var speed = document.getElementById("speed");
 
-var w = 20;
+var w = 1;
 var Size = Math.floor((innerWidth - 100) / w);
 
 var gap = false;

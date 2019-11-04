@@ -57,10 +57,11 @@ document.getElementById("qs").onclick = function () {
 document.getElementById("ss").onclick = function () {
   slowSort(Bars, 0, Bars.length - 1);
 };
-
+/*
 document.getElementById("bs").onclick = function () {
   bubbleSort(Bars, 0, Bars.length - 1);
 };
+*/
 
 //qs
 

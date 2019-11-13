@@ -10,7 +10,7 @@ var w = 1;
 var Size = Math.floor((innerWidth - 100) / w);
 
 var gap = false;
-var running = false; //there are corrently working sorters
+var lockdown = false; //needed to terminate the running sorts
 
 class Bar {
   constructor(x, y, val, state) {
@@ -19,15 +19,14 @@ class Bar {
     this.val = val;
     this.state = 1;
   }
+
   draw() {
     if (this.state == 0) {
-      c.fillStyle = "#e61919";
+      c.fillStyle = "#e61919";//red
     } else if (this.state == 1) {
-      c.fillStyle = "#4CAF50";
+      c.fillStyle = "#4CAF50";//green
     } else if ((this.state = -1)) {
       c.fillStyle = "white";
-    } else {
-      c.fillStyle = "ED6FFB7";
     }
 
     c.fillRect(this.x, this.y, w, this.val);
@@ -35,6 +34,8 @@ class Bar {
 }
 
 var Bars = [];
+var Bars_c = [];
+var sort_i = [];
 
 //lockdown
 
@@ -52,26 +53,29 @@ document.getElementById("new").onclick = function () {
 
 document.getElementById("qs").onclick = function () {
   quickSort(Bars, 0, Bars.length - 1);
+  console.log(sort_i);
 };
 
 document.getElementById("ss").onclick = function () {
   slowSort(Bars, 0, Bars.length - 1);
 };
-/*
+
 document.getElementById("bs").onclick = function () {
   bubbleSort(Bars, 0, Bars.length - 1);
 };
-*/
 
+document.getElementById("finish").onclick = function () {
+  finish();
+}
 //qs
 
+// This sort will call itself recursevly
+
 async function quickSort(arr, start, end) {
-  if (start >= end) {
-    for (i = 0; i <= Bars.lengthi; i++) Bars[i].state = -1;
-    Redraw();
+  if (start >= end || lockdown == true) {
     return;
   }
-  var index = await partition(arr, start, end);
+  var index = await partition(arr, start, end);// have to wait for an index before running anything else
   Bars[index].state = -1;
 
   await Promise.all([
@@ -90,14 +94,14 @@ async function partition(arr, start, end) {
   Bars[pivotIndex].states = 0;
   for (var i = start; i < end; i++) {
     if (arr[i].val < pivotValue) {
-      await swap(arr, i, pivotIndex);
+      await addInst(arr, i, pivotIndex);
 
       Bars[pivotIndex].state = -1;
       pivotIndex++;
       Bars[pivotIndex].state = 0;
     }
   }
-  await swap(arr, pivotIndex, end);
+  await addInst(arr, pivotIndex, end);
 
   for (var i = start; i < end; i++) {
     if (i != pivotIndex) {
@@ -110,35 +114,38 @@ async function partition(arr, start, end) {
 //ss
 
 async function slowSort(arr, start, end) {
-  if (start >= end) {
-    for (i = 0; i <= Bars.lengthi; i++) Bars[i].state = -1;
-    Redraw();
+  if (start >= end || lockdown == true) {
     return;
   }
 
   var index = await partitionS(arr, start, end);
+  if (index = -1) {
+    return;
+  }
   Bars[index].state = -1;
 
   await slowSort(arr, start, index - 1), await slowSort(arr, index + 1, end);
 }
+
 async function partitionS(arr, start, end) {
-  for (var i = start; i < end; i++) {
-    Bars[i].state = 1;
+  if (lockdown == true) {
+    return -1;
   }
 
   var pivotValue = arr[end].val;
   var pivotIndex = start;
   Bars[pivotIndex].states = 0;
+
   for (var i = start; i < end; i++) {
     if (arr[i].val < pivotValue) {
-      await swap(arr, i, pivotIndex);
+      await addInst(arr, i, pivotIndex);
 
       Bars[pivotIndex].state = -1;
       pivotIndex++;
       Bars[pivotIndex].state = 0;
     }
   }
-  await swap(arr, pivotIndex, end);
+  await addInst(arr, pivotIndex, end);
 
   for (var i = start; i < end; i++) {
     if (i != pivotIndex) {
@@ -158,7 +165,7 @@ async function bubbleSort() {
       Bars[j].state = -1;
 
       if (Bars[j].val > Bars[j + 1].val) {
-        swap(Bars ,j, j+1);
+        addInst(Bars, j, j + 1);
       }
       Bars[j].state = 0;
     }
@@ -170,14 +177,17 @@ async function bubbleSort() {
 
 function generateNewArray() {
   Bars.splice(0, Bars.length);
-  c.clearRect(0, 0, innerWidth, innerHeight); // remove old
+  Bars_c.splice(0, Bars.length);
+  c.clearRect(0, 0, innerWidth, innerHeight); // remove old canvas img
   for (i = 0; i < Size; i++) {
     Bars.push(
       new Bar(50 + i * (w + gap), 50, Math.round(Math.random() * 500) + 5, 0)
     );
   }
+  Bars_c = Bars;
   Redraw();
-  //console.log(Bars);
+  console.log(Bars_c);
+  console.log(Bars);
 }
 
 generateNewArray();
@@ -189,23 +199,24 @@ function Redraw() {
   }
 }
 
-async function swap(arr, a, b) {
-  await sleep(speed.value);
+async function addInst(arr, a, b) {
+  sort_i.push({ a, b });// store each operation for animation
   var temp = arr[a].val;
   arr[a].val = arr[b].val;
   arr[b].val = temp;
-  Redraw();
+}
+
+async function swap(arr, a, b) {
+  var temp = arr[a].val;
+  arr[a].val = arr[b].val;
+  arr[b].val = temp;
 }
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function getRandomColor() {
-  var varters = "0123456789ABCDEF".split("");
-  var color = "#";
-  for (var i = 0; i < 6; i++) {
-    color += varters[Math.round(Math.random() * 15)];
-  }
-  return color;
+//since speed can be modified during runtime , we can speed everything up when we need to finish the proces
+function finish() {
+  lockdown = true;
 }

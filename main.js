@@ -41,7 +41,7 @@ var Bars = [];
 function disableElement() {
   document.getElementById("new").disabled = true;
 }
-s
+
 range.onclick = function () {
 
   w = 101 - range.value; //101 is based on sliders max value
@@ -55,6 +55,7 @@ document.getElementById("new").onclick = function () {
 };
 
 document.getElementById("qs").onclick = function () {
+  disableElement();
   quickSort(Bars, 0, Bars.length - 1);
 };
 

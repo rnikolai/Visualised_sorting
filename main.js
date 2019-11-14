@@ -6,8 +6,8 @@ var c = canvas.getContext("2d");
 var range = document.getElementById("range");
 var speed = document.getElementById("speed");
 
-var w = 1;
-var Size = Math.floor((innerWidth - 100) / w);
+var widthOfBar = 1;
+var Size = Math.floor((innerWidth - 100) / widthOfBar);
 
 var gap = false;
 var running = false; //there are corrently working sorters
@@ -20,17 +20,19 @@ class Bar {
     this.state = 1;
   }
   draw() {
-    if (this.state == 0) {
+    /* if (this.state == 0) {
       c.fillStyle = "#e61919";
     } else if (this.state == 1) {
       c.fillStyle = "#4CAF50";
-    } else if ((this.state = -1)) {
+    } else if (this.state == -1) {
       c.fillStyle = "white";
-    } else {
-      c.fillStyle = "ED6FFB7";
-    }
-
-    c.fillRect(this.x, this.y, w, this.val);
+    } else if(this.state == 2) {
+      c.fillStyle = "blue";
+    }  else if(this.state == 3) {
+      c.fillStyle = "purple";
+    } */
+    c.fillStyle = "white";
+    c.fillRect(this.x, this.y, widthOfBar, this.val);
   }
 }
 
@@ -39,28 +41,37 @@ var Bars = [];
 //lockdown
 
 function disableElement() {
-  document.getElementById("new").disabled = true;
+  document.getElementById("new").disable = true;
+  document.getElementById("qs").disable = true;
+  document.getElementById("ss").disable = true;
+  document.getElementById("range").disable = true;
 }
 
-range.onclick = function () {
+function enableElement() {
+  document.getElementById("new").disable = false;
+  document.getElementById("qs").disable = false;
+  document.getElementById("ss").disable = false;
+  document.getElementById("range").disable = false;
+}
 
-  w = 101 - range.value; //101 is based on sliders max value
-  Size = Math.floor((innerWidth - 100) / w);
+range.onclick = function() {
+  widthOfBar = Math.floor((innerWidth - 100) /  range.value); //101 is based on sliders max value
+  Size = Math.floor((innerWidth - 100) / widthOfBar);
   generateNewArray();
-
 };
 
-document.getElementById("new").onclick = function () {
+document.getElementById("new").onclick = function() {
   generateNewArray();
 };
 
-document.getElementById("qs").onclick = function () {
+document.getElementById("qs").onclick = function() {
   disableElement();
   quickSort(Bars, 0, Bars.length - 1);
+  Redraw();
 };
 
-document.getElementById("ss").onclick = function () {
-  slowSort(Bars, 0, Bars.length - 1);
+document.getElementById("ss").onclick = function() {
+ replace(Bars,1,10);
 };
 /*
 document.getElementById("bs").onclick = function () {
@@ -72,13 +83,9 @@ document.getElementById("bs").onclick = function () {
 
 async function quickSort(arr, start, end) {
   if (start >= end) {
-    for (i = 0; i <= Bars.lengthi; i++) Bars[i].state = -1;
-    Redraw();
     return;
   }
   var index = await partition(arr, start, end);
-  Bars[index].state = -1;
-
   await Promise.all([
     quickSort(arr, start, index - 1),
     quickSort(arr, index + 1, end)
@@ -86,29 +93,15 @@ async function quickSort(arr, start, end) {
 }
 
 async function partition(arr, start, end) {
-  for (var i = start; i < end; i++) {
-    Bars[i].state = 1;
-  }
-
   var pivotValue = arr[end].val;
   var pivotIndex = start;
-  Bars[pivotIndex].states = 0;
   for (var i = start; i < end; i++) {
     if (arr[i].val < pivotValue) {
       await swap(arr, i, pivotIndex);
-
-      Bars[pivotIndex].state = -1;
       pivotIndex++;
-      Bars[pivotIndex].state = 0;
     }
   }
   await swap(arr, pivotIndex, end);
-
-  for (var i = start; i < end; i++) {
-    if (i != pivotIndex) {
-      Bars[i].state = -1;
-    }
-  }
   return pivotIndex;
 }
 
@@ -116,60 +109,45 @@ async function partition(arr, start, end) {
 
 async function slowSort(arr, start, end) {
   if (start >= end) {
-    for (i = 0; i <= Bars.lengthi; i++) Bars[i].state = -1;
-    Redraw();
     return;
   }
 
   var index = await partitionS(arr, start, end);
-  Bars[index].state = -1;
 
-  await slowSort(arr, start, index - 1), await slowSort(arr, index + 1, end);
+  await slowSort(arr, start, index - 1);
+  await slowSort(arr, index + 1, end);
 }
 async function partitionS(arr, start, end) {
-  for (var i = start; i < end; i++) {
-    Bars[i].state = 1;
-  }
-
   var pivotValue = arr[end].val;
   var pivotIndex = start;
-  Bars[pivotIndex].states = 0;
   for (var i = start; i < end; i++) {
     if (arr[i].val < pivotValue) {
       await swap(arr, i, pivotIndex);
-
-      Bars[pivotIndex].state = -1;
       pivotIndex++;
-      Bars[pivotIndex].state = 0;
     }
   }
   await swap(arr, pivotIndex, end);
-
-  for (var i = start; i < end; i++) {
-    if (i != pivotIndex) {
-      Bars[i].state = -1;
-    }
-  }
   return pivotIndex;
 }
 
 //bs
 
-async function bubbleSort() {
+/* async function bubbleSort() {
   for (i = 0; i < Bars.length; i++) {
-    Bars[i].state = 0;
+    arr[i].state = 0;
     j = 0;
     for (j = 0; j < Bars.length - i - 1; j++) {
-      Bars[j].state = -1;
+      arr[j].state = -1;
 
-      if (Bars[j].val > Bars[j + 1].val) {
-        swap(Bars ,j, j+1);
+      if (arr[j].val > arr[j + 1].val) {
+        swap(Bars, j, j + 1);
       }
       Bars[j].state = 0;
     }
     Bars[i].state = 1;
   }
 }
+*/
 
 //shared functions
 
@@ -178,7 +156,7 @@ function generateNewArray() {
   c.clearRect(0, 0, innerWidth, innerHeight); // remove old
   for (i = 0; i < Size; i++) {
     Bars.push(
-      new Bar(50 + i * (w + gap), 50, Math.round(Math.random() * 500) + 5, 0)
+      new Bar(50 + i * (widthOfBar + gap), 50, Math.round(Math.random() * 500) + 5, 0)
     );
   }
   Redraw();
@@ -195,10 +173,18 @@ function Redraw() {
 }
 
 async function swap(arr, a, b) {
+  await sleep(speed.value);
   var temp = arr[a].val;
   arr[a].val = arr[b].val;
   arr[b].val = temp;
-  Redraw();
+  replace(arr,a,b);
+}
+
+function replace(arr,a,b){
+  c.clearRect(arr[a].x ,arr[a].y , widthOfBar , 505);
+  Bars[a].draw();
+  c.clearRect(arr[b].x ,arr[b].y , widthOfBar , 505);
+  Bars[b].draw();
 }
 
 function sleep(ms) {

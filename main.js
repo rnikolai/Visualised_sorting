@@ -41,22 +41,22 @@ var Bars = [];
 //lockdown
 
 function disableElement() {
-  document.getElementById("new").disable = true;
-  document.getElementById("qs").disable = true;
-  document.getElementById("ss").disable = true;
-  document.getElementById("range").disable = true;
+  document.getElementById("new").setAttribute("disabled","disabled");
+  document.getElementById("qs").setAttribute("disabled","disabled");
+  document.getElementById("ss").setAttribute("disabled","disabled");
+  document.getElementById("range").setAttribute("disabled","disabled");
 }
 
 function enableElement() {
-  document.getElementById("new").disable = false;
-  document.getElementById("qs").disable = false;
-  document.getElementById("ss").disable = false;
-  document.getElementById("range").disable = false;
+  document.getElementById("new").removeAttribute("disabled");
+  document.getElementById("qs").removeAttribute("disabled");
+  document.getElementById("ss").removeAttribute("disabled");
+  document.getElementById("range").removeAttribute("disabled");
 }
 
 range.onclick = function() {
   widthOfBar = Math.floor((innerWidth - 100) /  range.value); //101 is based on sliders max value
-  Size = Math.floor((innerWidth - 100) / widthOfBar);
+  Size = Math.floor((innerWidth - 100) / widthOfBar); //TO-DO add a size control
   generateNewArray();
 };
 
@@ -67,7 +67,7 @@ document.getElementById("new").onclick = function() {
 document.getElementById("qs").onclick = function() {
   disableElement();
   quickSort(Bars, 0, Bars.length - 1);
-  Redraw();
+  //Redraw();
 };
 
 document.getElementById("ss").onclick = function() {

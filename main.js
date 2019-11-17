@@ -17,34 +17,35 @@ class Bar {
     this.x = x;
     this.y = y;
     this.val = val;
-    this.state = 1;
+    this.state = 0;
   }
   draw() {
-    /* if (this.state == 0) {
-      c.fillStyle = "#e61919";
-    } else if (this.state == 1) {
-      c.fillStyle = "#4CAF50";
-    } else if (this.state == -1) {
-      c.fillStyle = "white";
-    } else if(this.state == 2) {
-      c.fillStyle = "blue";
-    }  else if(this.state == 3) {
-      c.fillStyle = "purple";
-    } */
-    c.fillStyle = "white";
+    switch (this.state) {
+      case 0:
+        c.fillStyle = "#4192D9";
+        break;
+      case 1:
+        c.fillStyle = "white";
+        break;
+      default:
+        c.fillStyle = "white";
+
+    }
+
     c.fillRect(this.x, this.y, widthOfBar, this.val);
   }
 }
 
 var Bars = [];
+var Bars_c = [];
 
 //lockdown
 
 function disableElement() {
-  document.getElementById("new").setAttribute("disabled","disabled");
-  document.getElementById("qs").setAttribute("disabled","disabled");
-  document.getElementById("ss").setAttribute("disabled","disabled");
-  document.getElementById("range").setAttribute("disabled","disabled");
+  document.getElementById("new").setAttribute("disabled", "disabled");
+  document.getElementById("qs").setAttribute("disabled", "disabled");
+  document.getElementById("ss").setAttribute("disabled", "disabled");
+  document.getElementById("range").setAttribute("disabled", "disabled");
 }
 
 function enableElement() {
@@ -54,24 +55,31 @@ function enableElement() {
   document.getElementById("range").removeAttribute("disabled");
 }
 
-range.onclick = function() {
-  widthOfBar = Math.floor((innerWidth - 100) /  range.value); //101 is based on sliders max value
+range.onclick = function () {
+  widthOfBar = Math.floor((innerWidth - 100) / range.value); //101 is based on sliders max value
   Size = Math.floor((innerWidth - 100) / widthOfBar); //TO-DO add a size control
   generateNewArray();
 };
 
-document.getElementById("new").onclick = function() {
+document.getElementById("new").onclick = function () {
   generateNewArray();
 };
 
-document.getElementById("qs").onclick = function() {
+document.getElementById("qs").onclick = async function () {
   disableElement();
-  quickSort(Bars, 0, Bars.length - 1);
+  var t0 = performance.now();
+  await quickSort(Bars, 0, Bars.length - 1);
+  var t1 = performance.now();
+  console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
+  enableElement();
+  console.log(Bars_c);
+  
+  
   //Redraw();
 };
 
-document.getElementById("ss").onclick = function() {
- replace(Bars,1,10);
+document.getElementById("ss").onclick = function () {
+  replace(Bars, 1, 10);
 };
 /*
 document.getElementById("bs").onclick = function () {
@@ -88,8 +96,10 @@ async function quickSort(arr, start, end) {
   var index = await partition(arr, start, end);
   await Promise.all([
     quickSort(arr, start, index - 1),
+    sleep(speed.value),
     quickSort(arr, index + 1, end)
   ]);
+  
 }
 
 async function partition(arr, start, end) {
@@ -173,17 +183,18 @@ function Redraw() {
 }
 
 async function swap(arr, a, b) {
-  await sleep(speed.value);
+  Bars_c.push({a,b});
   var temp = arr[a].val;
   arr[a].val = arr[b].val;
   arr[b].val = temp;
-  replace(arr,a,b);
+  
+  replace(arr, a, b);
 }
 
-function replace(arr,a,b){
-  c.clearRect(arr[a].x ,arr[a].y , widthOfBar , 505);
+async function replace(arr, a, b) {
+  c.clearRect(arr[a].x, arr[a].y, widthOfBar, 505);
   Bars[a].draw();
-  c.clearRect(arr[b].x ,arr[b].y , widthOfBar , 505);
+  c.clearRect(arr[b].x, arr[b].y, widthOfBar, 505);
   Bars[b].draw();
 }
 

@@ -11,7 +11,7 @@ var gap = 0;
 
 var time = -1;
 
-var widthOfBar = 1;
+var widthOfBar = 10;
 var Size = Math.floor((innerWidth - 100) / (widthOfBar + gap));
 
 var running = false; //there are corrently working sorters
